@@ -1,0 +1,48 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Text.RegularExpressions;
+using ceTe.DynamicPDF;
+using ceTe.DynamicPDF.PageElements;
+
+
+namespace service
+{
+    /// <summary>
+    /// Application Service
+    /// </summary>
+    public class DocumentService : IDocumentService
+    {
+        private readonly IMapper mapper;
+        private IConfiguration config;
+        private readonly ErrorMessages errorMessages;
+        private readonly ILogger logger;
+
+
+        public DocumentService(IConfiguration config, IMapper mapper,
+                        IOptions<ErrorMessages> errorMessages, ILogger logger)
+        {
+            this.mapper = mapper;
+            this.config = config;
+            this.errorMessages = errorMessages.Value;           
+            this.logger = logger;
+        }
+
+
+        public async Task<bool> GetPDFDocument(Guid applicationId)
+        {
+            Document document = new Document();
+            Page page = new Page(PageSize.A4);
+            document.Pages.Add(page);
+            Label label = new Label("Application ID:", 0, 0, 100, 100, Font.HelveticaBold, 18, TextAlign.Center);
+            page.Elements.Add(label);
+            label = new Label(applicationId.ToString(), 105, 0, 100, 100, Font.Helvetica, 18, TextAlign.Center);
+            page.Elements.Add(label);
+            document.Draw("output.pdf");
+            return true;
+        }
+
+    }
+}
